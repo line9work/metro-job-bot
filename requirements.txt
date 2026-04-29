@@ -4,3 +4,4 @@ urllib3
 playwright
 beautifulsoup4
 requests
+playwright

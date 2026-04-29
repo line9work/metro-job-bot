@@ -191,7 +191,22 @@ def hash_job(site, text):
 # FETCH PAGE
 # ======================================
 
-def fetch_page(url):
+def fetch(url, site=None):
+    try:
+        # 🔥 DMRC browser mode
+        if site == "Delhi Metro":
+            return fetch_dmrc(url)
+
+        # 🌐 normal sites
+        r = requests.get(url, headers=HEADERS, timeout=20, verify=False)
+
+        if r.status_code != 200:
+            return None
+
+        return BeautifulSoup(r.text, "html.parser")
+
+    except:
+        return None
     for attempt in range(1, RETRY_ATTEMPTS + 1):
         try:
             response = requests.get(
@@ -330,7 +345,7 @@ def extract_job_title(text):
 # ======================================
 
 def get_jobs_from_url(site, url):
-    soup = fetch_page(url)
+    soup = fetch(url, site)
 
     if not soup:
         return []

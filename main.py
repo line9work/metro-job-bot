@@ -204,15 +204,17 @@ if site in js_sites:
     return fetch_dmrc(url)
 
         # 🌐 normal sites
-        r = requests.get(url, headers=HEADERS, timeout=20, verify=False)
+r = requests.get(url, headers=HEADERS, timeout=20, verify=False)
 
-        if r.status_code != 200:
-            return None
+if r.status_code != 200:
+    return None
 
-        return BeautifulSoup(r.text, "html.parser")
+return BeautifulSoup(r.text, "html.parser")
 
-    except:
-        return None
+except Exception as e:
+    log.error(e)
+    return None
+
     for attempt in range(1, RETRY_ATTEMPTS + 1):
         try:
             response = requests.get(

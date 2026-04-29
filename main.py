@@ -193,50 +193,27 @@ def hash_job(site, text):
 
 def fetch(url, site=None):
     try:
-        # 🔥 DMRC browser mode
-       js_sites = [
-          "Delhi Metro",
-          "MMRCL Mumbai Metro",
-          "MMMOCL"
-]
+        js_sites = [
+            "Delhi Metro",
+            "MMRCL Mumbai Metro",
+            "MMMOCL"
+        ]
 
-if site in js_sites:
-    return fetch_dmrc(url)
+        # 🔥 JS sites → Playwright browser
+        if site in js_sites:
+            return fetch_dmrc(url)
 
         # 🌐 normal sites
-r = requests.get(url, headers=HEADERS, timeout=20, verify=False)
+        r = requests.get(url, headers=HEADERS, timeout=20, verify=False)
 
-if r.status_code != 200:
-    return None
+        if r.status_code != 200:
+            return None
 
-return BeautifulSoup(r.text, "html.parser")
+        return BeautifulSoup(r.text, "html.parser")
 
-except Exception as e:
-    log.error(e)
-    return None
-
-    for attempt in range(1, RETRY_ATTEMPTS + 1):
-        try:
-            response = requests.get(
-                url,
-                headers=HEADERS,
-                timeout=REQUEST_TIMEOUT,
-                verify=False
-            )
-
-            response.encoding = response.apparent_encoding
-            response.raise_for_status()
-
-            return BeautifulSoup(response.text, "html.parser")
-
-        except Exception as e:
-            log.warning(f"Attempt {attempt} failed: {url} -> {e}")
-
-            if attempt < RETRY_ATTEMPTS:
-                sleep(RETRY_DELAY)
-
-    log.error(f"Failed after retries: {url}")
-    return None
+    except Exception as e:
+        log.error(f"Fetch error: {e}")
+        return None
 def fetch_dmrc(url):
     try:
         with sync_playwright() as p:
@@ -245,11 +222,12 @@ def fetch_dmrc(url):
 
             page.goto(url, timeout=60000)
             page.wait_for_timeout(8000)
-            
+
             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
             page.wait_for_timeout(3000)
-            
+
             html = page.content()
+
             browser.close()
 
             return BeautifulSoup(html, "html.parser")
@@ -257,6 +235,7 @@ def fetch_dmrc(url):
     except Exception as e:
         log.error(f"DMRC Playwright error: {e}")
         return None
+
 
 # ======================================
 # DATE EXTRACTION

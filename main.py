@@ -194,8 +194,14 @@ def hash_job(site, text):
 def fetch(url, site=None):
     try:
         # 🔥 DMRC browser mode
-        if site == "Delhi Metro":
-            return fetch_dmrc(url)
+       js_sites = [
+          "Delhi Metro",
+          "MMRCL Mumbai Metro",
+          "MMMOCL"
+]
+
+if site in js_sites:
+    return fetch_dmrc(url)
 
         # 🌐 normal sites
         r = requests.get(url, headers=HEADERS, timeout=20, verify=False)
@@ -236,8 +242,11 @@ def fetch_dmrc(url):
             page = browser.new_page()
 
             page.goto(url, timeout=60000)
-            page.wait_for_timeout(5000)
-
+            page.wait_for_timeout(8000)
+            
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            page.wait_for_timeout(3000)
+            
             html = page.content()
             browser.close()
 

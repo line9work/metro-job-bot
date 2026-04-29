@@ -1,5 +1,5 @@
 # main.py
-
+from playwright.sync_api import sync_playwright
 import os
 import re
 import logging
@@ -214,7 +214,23 @@ def fetch_page(url):
 
     log.error(f"Failed after retries: {url}")
     return None
+def fetch_dmrc(url):
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
 
+            page.goto(url, timeout=60000)
+            page.wait_for_timeout(5000)
+
+            html = page.content()
+            browser.close()
+
+            return BeautifulSoup(html, "html.parser")
+
+    except Exception as e:
+        log.error(f"DMRC Playwright error: {e}")
+        return None
 
 # ======================================
 # DATE EXTRACTION
